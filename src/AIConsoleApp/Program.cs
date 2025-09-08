@@ -6,11 +6,20 @@ Run this model in C#.
 using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
+using Microsoft.Extensions.Configuration;
 
 // To authenticate with the model you will need to generate a personal access token (PAT) in your GitHub settings. 
 // Create your PAT token by following instructions here: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
-var credential = "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";
+var config = new ConfigurationBuilder()
+    .AddUserSecrets<Program>()
+    .Build();
 
+var credential = config["GitHub:Pat"];
+if (string.IsNullOrEmpty(credential))
+{
+    Console.WriteLine("GitHub PAT not found in user secrets.");
+    return;
+}
 var openAIOptions = new OpenAIClientOptions()
 {
     Endpoint = new Uri("https://models.github.ai/inference")
